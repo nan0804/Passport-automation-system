@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manage Passport Applications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .approve {
+            background-color: green;
+            color: white;
+        }
+        .reject {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Admin Panel - Manage Passport Applications</h2>
+    <div class="container">
+        <table id="applicationsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Applications will be loaded dynamically here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // ✅ Fetch all applications from backend
+        async function fetchApplications() {
+            try {
+                const response = await fetch("/api/admin/applications");
+                const data = await response.json();
+
+                const tableBody = document.querySelector("#applicationsTable tbody");
+                tableBody.innerHTML = ""; // Clear previous rows
+
+                if (data.applications.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4">No applications found.</td></tr>`;
+                } else {
+                    data.applications.forEach((app) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${app.name}</td>
+                            <td>${app.email}</td>
+                            <td id="status-${app._id}">${app.status}</td>
+                            <td>
+                                <button class="approve" onclick="updateStatus('${app._id}', 'Approved')">Approve</button>
+                                <button class="reject" onclick="updateStatus('${app._id}', 'Rejected')">Reject</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch applications:", error);
+                alert("Failed to load applications!");
+            }
+        }
+
+        // ✅ Update application status (Approve/Reject)
+        async function updateStatus(applicationId, status) {
+            try {
+                const response = await fetch("/api/admin/update-status", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ applicationId, status }),
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById(`status-${applicationId}`).innerText = status;
+                    alert(`Application ${status} successfully!`);
+                } else {
+                    alert("Failed to update status!");
+                }
+            } catch (error) {
+                console.error("Failed to update status:", error);
+                alert("Error updating application status!");
+            }
+        }
+
+        // Load applications on page load
+        fetchApplications();
+    </script>
+
+</body>
+</html>

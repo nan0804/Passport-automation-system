@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Apply for Passport</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Full Page Styling */
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        /* Heading */
+        h1 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        /* Input Fields */
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 15px;
+        }
+
+        /* Input Focus Effect */
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+            outline: none;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px 0;
+        }
+
+        /* Button Hover */
+        button:hover {
+            background: #0056b3;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            input,
+            button {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Apply for Passport</h1>
+
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+
+    <button onclick="submitApplication()">Submit Application</button>
+
+    <br><br>
+    <!-- ✅ User Panel Button -->
+    <button onclick="goToUserPanel()">User Panel</button>
+
+    <script>
+        // ✅ Fetch stored userId from localStorage
+        const userId = localStorage.getItem('userId');
+
+        function submitApplication() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            if (!name || !email) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            fetch('/api/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, name, email })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    window.location.href = '/admin'; // ✅ Redirect to admin panel after apply
+                }
+            })
+            .catch(err => console.error("Error:", err));
+        }
+
+        function goToUserPanel() {
+            window.location.href = '/user-panel'; // ✅ Navigate to User Panel
+        }
+    </script>
+</body>
+
+</html>
+
+
+
+
+    
